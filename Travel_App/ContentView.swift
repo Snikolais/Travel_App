@@ -12,6 +12,7 @@ struct ContentView: View {
             Header()
             
             HStack {
+                
                 categories
                     .padding(.leading, 30)
                     .animation(.linear(duration: 0.05))
