@@ -1,8 +1,11 @@
 import SwiftUI
 
+
 struct ContentView: View {
     
     @State private var selectedCategoryIndex: Int = 0
+    @State private var selectedCardIndex: Int = 0
+    @State private var selectedCardWithFoodIndex: Int = 0
     
     var body: some View {
         VStack {
@@ -14,16 +17,13 @@ struct ContentView: View {
                     .animation(.linear(duration: 0.05))
                 
                 Spacer()
+                
             }
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 30) {
-                    Card1()
                     
-                    Card2()
-                    
-                    Card3()
-                    
+                    cards
                 }
                 .padding(.leading, 30)
             }
@@ -36,12 +36,14 @@ struct ContentView: View {
                     .padding(.leading, 30)
                 
                 
+                ScrollView(.horizontal, showsIndicators: false) {
                     HStack (spacing: 20) {
-                        CardWithFood1()
-                        CardWithFood2()
-                        CardWithFood3()
-                    }
+                            
+                           cardsWithFood
+                        }
                     .padding(.leading, 30)
+                    .padding(.bottom, 60)
+                }
                 
             }
             .padding(.top, 30)
@@ -54,6 +56,33 @@ struct ContentView: View {
         return ForEach(0..<titles.count, id: \.self) { i in
             CategoryView(title: titles[i], isSelected: .init(get: {self.selectedCategoryIndex == i}, set: { _ in }))
                 .onTapGesture { self.selectedCategoryIndex = i }
+        }
+    }
+    
+    private var cards: some View {
+        let cards = [["Mountain1", "Mount Fuji", "Fujinomiya, Japan"],
+                    ["Mountain2", "Mount Fuji", "Shibuya-ku, Japan"],
+                    [ "Mountain1", "Mount Fuji", "Fujinomiya, Japan"]]
+        
+        
+        
+        return ForEach(0..<cards.count, id: \.self) { info in
+            CardView(imageName: cards[info][0], name: cards[info][1], someInfo: cards[info][2], isSelected: .init(get:
+                               {self.selectedCardIndex == info}, set: {_ in}))
+                .onTapGesture(perform: {self.selectedCardIndex = info})
+
+            
+        }
+    }
+    
+    private var cardsWithFood: some View {
+        let cards = [["Sushi1", "Sushi"],
+                     ["Roman", "Roman"],
+                     ["Sushi2", "Sushi"]]
+        
+        return ForEach(0..<cards.count, id: \.self) {info in
+            CardWithFoodView(imageName: cards[info][0], nameFood: cards[info][1], isSelected: .init(get: {self.selectedCardWithFoodIndex == info}, set: {_ in}))
+                .onTapGesture(perform: {self.selectedCardWithFoodIndex = info})
         }
     }
 }
@@ -101,77 +130,51 @@ private struct Header: View {
     }
 }
 
-struct Card1: View {
-    var body: some View {
-        ZStack {
-            Image("Mountain1")
-                .resizable()
-                .frame(width: 250, height: 350)
-                .cornerRadius(20)
-            
-            VStack(alignment: .leading) {
-                Text("Mount Fuji")
-                    .foregroundColor(Color.white)
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
-                
-                Text("Fujinomiya, Japan")
-                    .foregroundColor(.white)
-                    .font(.system(size: 16, weight: .medium, design: .rounded))
-                    .padding(.top, 5)
-            }
-            .offset(x: -20, y: 120)
-        }
-    }
-}
-
-struct Card2: View {
-    var body: some View {
-        ZStack {
-            Image("Mountain2")
-                .resizable()
-                .frame(width: 250, height: 350)
-                .cornerRadius(20)
-            
-            VStack(alignment: .leading) {
-                Text("Mount Fuji")
-                    .foregroundColor(Color.white)
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
-                
-                Text("Shibuya-ku, Japan")
-                    .foregroundColor(.white)
-                    .font(.system(size: 16, weight: .medium, design: .rounded))
-                    .padding(.top, 5)
-            }
-            .offset(x: -20, y: 120)
-        }
-    }
-}
-
-struct Card3: View {
+struct CardView: View  {
     
-    var body: some View {
-        ZStack {
-            Image("Mountain1")
-                .resizable()
-                .frame(width: 250, height: 350)
-                .cornerRadius(20)
-            
-            VStack(alignment: .leading) {
-                Text("Mount Fuji")
-                    .foregroundColor(Color.white)
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
+    let imageName: String
+    let name: String
+    let someInfo: String
+    
+    @Binding var isSelected: Bool
+    
+     var body: some View {
+           ZStack {
+               Image(imageName)
+                   .resizable()
+                   .frame(width: 250, height: 350)
+                   .cornerRadius(20)
+                .opacity(!isSelected ? 0.5 : 1)
+                .overlay(RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color.blue, lineWidth: 5)
+                    .opacity(!isSelected ? 0 : 1))
                 
-                Text("Fujinomiya, Japan")
-                    .foregroundColor(.white)
-                    .font(.system(size: 16, weight: .medium, design: .rounded))
-                    .padding(.top, 5)
-            }
-            .offset(x: -20, y: 120)
-        }
-    }
+               VStack(alignment: .leading) {
+                    Text(name)
+                       .foregroundColor(Color.white)
+                       .font(.system(size: 22, weight: .bold, design: .rounded))
+                   
+                    Text(someInfo)
+                       .foregroundColor(.white)
+                       .font(.system(size: 16, weight: .medium, design: .rounded))
+                       .padding(.top, 5)
+                
+               }
+               .offset(x: -20, y: 120)
+            
+           }
+           .frame(width: 255, height: 355)
+           
+       }
 }
 
-struct CardWithFood1: View {
+
+struct CardWithFoodView: View {
+    
+    let imageName: String
+    let nameFood: String
+    
+    @Binding var isSelected: Bool
     
     var body: some View {
         ZStack {
@@ -179,16 +182,19 @@ struct CardWithFood1: View {
                 Text("")
             }
             .frame(width: 100, height: 140)
-            .background(Color(#colorLiteral(red: 0.8443396688, green: 0.8482480645, blue: 0.8577985168, alpha: 1)))
+            .background(Color("ShadowColorForCardWithFood"))
             .cornerRadius(20)
             .shadow(color: Color(.black).opacity(0.2), radius: 20, x: 0, y: 20)
             .offset(y: 8)
+            .opacity(isSelected ? 1 : 0)
             
             VStack {
-                Image("Sushi1")
+                
+                Image(imageName)
                     .resizable()
                     .frame(width: 50, height: 50)
-                Text("Sushi")
+                    .cornerRadius(30)
+                Text(nameFood)
                     .font(.system(size: 16, weight: .bold, design: .rounded))
                     .padding(.top, 10)
             }
@@ -197,47 +203,8 @@ struct CardWithFood1: View {
             .cornerRadius(20)
             
         }
+        
+
     }
 }
 
-struct CardWithFood2: View {
-    var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(Color(#colorLiteral(red: 0.8901960784, green: 0.8823529412, blue: 0.8941176471, alpha: 1)))
-            VStack {
-                Image("Roman")
-                    .resizable()
-                    .frame(width: 50, height: 50)
-                    .cornerRadius(25)
-                
-                Text("Romen")
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
-                    .padding(.top, 9)
-            }
-            
-        }
-        .frame(width: 110, height: 140)
-    }
-}
-
-struct CardWithFood3: View {
-    var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(Color(#colorLiteral(red: 0.8901960784, green: 0.8823529412, blue: 0.8941176471, alpha: 1)))
-            VStack {
-                Image("Sushi2")
-                    .resizable()
-                    .frame(width: 50, height: 50)
-                    .cornerRadius(25)
-                
-                Text("Sushi")
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
-                    .padding(.top, 9)
-            }
-            
-        }
-        .frame(width: 110, height: 140)
-    }
-}
